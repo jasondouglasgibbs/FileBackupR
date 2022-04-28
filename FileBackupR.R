@@ -59,6 +59,7 @@ for(i in 1:nrow(FileList)){
 rownames(FileList)<-NULL
 RemovalList<-sapply(RemovalList,"[[",1)
 UpdatedFiles<-FileList[-RemovalList,]
+rownames(UpdatedFiles)<-NULL
 
 if(nrow(UpdatedFiles>0)){
   UpdatedFiles$Destination_Path<-NA
