@@ -39,18 +39,22 @@ FileList$Reduced_Path<-paste0(basename(dirname(FileList[,"File_Path"])),"/", bas
 ##Destination Folder
 DestinationFiles<-as.data.frame(list.files(DestinationFolder, full.names=TRUE, recursive = TRUE))
 colnames(DestinationFiles) <- c("File_Path")
+##Fixes the destination file path to the approriate destination path.##
+DestinationFiles$File_Path<-substring(DestinationFiles$File_Path, 5)
+DestinationFiles$File_Path<-paste0(DestinationFolder, DestinationFiles$File_Path)
+##Pulls the modified times.
 DestinationFiles$Modified_Time<-file.mtime(DestinationFiles$File_Path)
 DestinationFiles$Reduced_Path<-paste0(basename(dirname(DestinationFiles[,"File_Path"])),"/", basename(DestinationFiles[,"File_Path"]))
-
 
 ##Finds files that exist both in the main folder and the destination folder.
 ##Removes the files if they exist in both locations.##
 RemovalList<-list()
 
+
 for(i in 1:nrow(FileList)){
   FileNameFilter<-FileList[i,"Reduced_Path"]
   DestinationFileFilter<-filter(DestinationFiles, Reduced_Path==FileNameFilter)
-    if(FileList[i, "Modified_Time"]<DestinationFiles[1,"Modified_Time"]){
+    if(FileList[i, "Modified_Time"]<DestinationFileFilter[1,"Modified_Time"]){
       RemovalListAdd<-i
       RemovalList<-rbind(RemovalList,RemovalListAdd)
     }
