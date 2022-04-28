@@ -4,20 +4,23 @@
 ##Libraries
 library(tidyverse)
 library(readxl)
-
+library(tictoc)
+tic("Total")
 ##Inputs##
-DestinationFolder<-"D:/Gibbs"
+DestinationFolder<-"H:/"
 
 ##Read in list of folders to transfer##
 FoldersToTransfer<-as.data.frame(read_xlsx("LocalFileList.xlsx"))
 
 
 ##Transfers files that don't exist on the backup drive.
+tic("New File Transfer")
 for(i in 1:nrow(FoldersToTransfer)){
 file.copy(from=FoldersToTransfer[i, "Path"], to=DestinationFolder, recursive = TRUE, overwrite = FALSE)
 }
+toc()
 
-
+tic("Modified File Transfer")
 for (i in 1:nrow(FoldersToTransfer)){
   if(i==1){
   FileList<-as.data.frame(list.files(FoldersToTransfer[i,"Path"], full.names = TRUE, recursive = TRUE))
@@ -45,12 +48,12 @@ DestinationFiles$Reduced_Path<-paste0(basename(dirname(DestinationFiles[,"File_P
 RemovalList<-list()
 
 for(i in 1:nrow(FileList)){
-  for(j in 1:nrow(FileList)){
-    if(FileList[i,"Reduced_Path"]==DestinationFiles[j, "Reduced_Path"]&FileList[i, "Modified_Time"]<DestinationFiles[j,"Modified_Time"]){
+  FileNameFilter<-FileList[i,"Reduced_Path"]
+  DestinationFileFilter<-filter(DestinationFiles, Reduced_Path==FileNameFilter)
+    if(FileList[i, "Modified_Time"]<DestinationFiles[1,"Modified_Time"]){
       RemovalListAdd<-i
       RemovalList<-rbind(RemovalList,RemovalListAdd)
     }
-  }
 }
 
 rownames(FileList)<-NULL
@@ -70,4 +73,5 @@ if(nrow(UpdatedFiles>0)){
   print("No modified files found.")
   
 }
-
+toc()
+toc()
